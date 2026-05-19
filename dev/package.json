@@ -5,10 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "preprocess": "node scripts/preprocess-model.mjs public/models/911-reduced public/models/911-reduced/processed",
     "build": "tsc && vite build",
     "preview": "vite preview"
   },
   "devDependencies": {
+    "@webgpu/types": "^0.1.70",
     "typescript": "~6.0.2",
     "vite": "^8.0.10"
   },

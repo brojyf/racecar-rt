@@ -1,13 +1,14 @@
 import { vec3 } from "gl-matrix";
 import type { Ray } from "./ray";
 import { 
-    CAMERA_FLOAT_COUNT, 
     DEFAULT_CAMERA_FORWARD, 
     DEFAULT_CAMERA_FOV, 
     DEFAULT_CAMERA_POSITION, 
     DEFAULT_CAMERA_RIGHT, 
     DEFAULT_CAMERA_UP 
 } from "../config";
+
+const CAMERA_FLOAT_COUNT = 20;
 
 export interface Camera {
     position: vec3;

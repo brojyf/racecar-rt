@@ -1,6 +1,15 @@
 import { vec3 } from "gl-matrix";
 import type { Camera } from "../raytracer/camera";
-import { DEFAULT_THETA, DEFAULT_PHI, SENSITIVITY, MIN_PHI, MAX_DISTANCE_SCALE, MIN_DISTANCE_SCALE, ZOOM_SPEED, TRACKPAD_ROTATE_SPEED } from "../config";
+import {
+    DEFAULT_THETA,
+    DEFAULT_PHI,
+    SENSITIVITY,
+    MIN_PHI,
+    MAX_DISTANCE_SCALE,
+    MIN_DISTANCE_SCALE,
+    ZOOM_SPEED,
+    TRACKPAD_ROTATE_SPEED
+} from "../config";
 
 const WORLD_UP = vec3.fromValues(0, 1, 0);
 
@@ -8,7 +17,8 @@ export function setupMouseLook(
     canvas: HTMLCanvasElement,
     camera: Camera,
     target: vec3,
-    radius: number
+    radius: number,
+    floorY: number
 ) {
     let isDragging = false;
     let lastX = 0;
@@ -18,7 +28,14 @@ export function setupMouseLook(
     let distance = radius;
     const minDistance = radius * MIN_DISTANCE_SCALE;
     const maxDistance = radius * MAX_DISTANCE_SCALE;
-    update(camera, theta, phi, target, distance);
+    const floorMargin = 0.01;
+    update(camera, theta, clampPhi(phi, distance), target, distance);
+
+    function clampPhi(value: number, d: number): number {
+        const cosLimit = (floorY + floorMargin - target[1]) / d;
+        const upper = cosLimit <= -1 ? Math.PI - MIN_PHI : Math.min(Math.PI - MIN_PHI, Math.acos(cosLimit));
+        return Math.min(Math.max(value, MIN_PHI), upper);
+    }
     
     canvas.addEventListener("pointerdown", (e) => {
         isDragging = true;
@@ -43,7 +60,7 @@ export function setupMouseLook(
         lastY = e.clientY;
 
         theta += dx;
-        phi = Math.min(Math.max(phi - dy, MIN_PHI), Math.PI - MIN_PHI);
+        phi = clampPhi(phi - dy, distance);
 
         update(camera, theta, phi, target, distance);
     });
@@ -56,11 +73,9 @@ export function setupMouseLook(
             distance = Math.min(Math.max(distance, minDistance), maxDistance);
         } else {
             theta -= e.deltaX * TRACKPAD_ROTATE_SPEED;
-            phi = Math.min(
-                Math.max(phi + e.deltaY * TRACKPAD_ROTATE_SPEED, MIN_PHI),
-                Math.PI - MIN_PHI
-            );
+            phi += e.deltaY * TRACKPAD_ROTATE_SPEED;
         }
+        phi = clampPhi(phi, distance);
         update(camera, theta, phi, target, distance);
     }, { passive: false });
 }

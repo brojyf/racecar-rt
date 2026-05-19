@@ -1,5 +1,7 @@
-import { 
-    CODE_RANGE, LEAF_TRIANGLE_COUNT, NODE_FLOAT_COUNT, TRIANGLE_BYTE_SIZE } from "../config";
+const CODE_RANGE = 1023;
+const LEAF_TRIANGLE_COUNT = 4;
+const NODE_FLOAT_COUNT = 8;
+const TRIANGLE_BYTE_SIZE = 32;
 
 export interface BVH {
     nodes    : Float32Array<ArrayBuffer>;
